@@ -216,7 +216,7 @@ contract CAKEFarmer {
 	}
 
 	function getUserTotalReferrals(address userAddress) public view returns(uint256) {
-		return users[userAddress].levels[0];
+		return users[userAddress].levels[0]+users[userAddress].levels[1]+users[userAddress].levels[2]+users[userAddress].levels[3]+users[userAddress].levels[4];
 	}
 
 	function getUserReferralBonus(address userAddress) public view returns(uint256) {
