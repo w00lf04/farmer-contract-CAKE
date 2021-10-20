@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.9;
 
 interface IERC20 {
@@ -24,7 +25,7 @@ contract CAKEFarmer {
 	using SafeMath for uint256;
     address erctoken = address(0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82);  //CAKE
 	uint256 constant public INVEST_MIN_AMOUNT = 5e16; // 0.05 bnb
-	uint256 public REFERRAL_PERCENT = 70;
+	uint256[] public REFERRAL_PERCENTS = [70, 30, 15, 10, 5];
 	uint256 constant public PROJECT_FEE = 33; // each
 	uint256 constant public PERCENT_STEP = 5;
 	uint256 constant public PERCENTS_DIVIDER = 1000;
@@ -72,7 +73,7 @@ contract CAKEFarmer {
 	constructor() {
         ceoAddress=msg.sender;
         //ceoAddress2=address(0xXXX); //@TODO: set Address
-        //ceoAddress3=address(0xXXX);
+        //ceoAddress3=address(0xXXX); //@TODO: set Address
         
         token_CAKE = IERC20(erctoken);
 
@@ -104,7 +105,7 @@ contract CAKEFarmer {
 
 		User storage user = users[msg.sender];
 
-        if (user.referrer == address(0)) {
+		if (user.referrer == address(0)) {
 			if (users[referrer].deposits.length > 0 && referrer != msg.sender) {
 				user.referrer = referrer;
 			}
@@ -113,14 +114,14 @@ contract CAKEFarmer {
 			for (uint256 i = 0; i < 5; i++) {
 				if (upline1 != address(0)) {
 					users[upline1].levels[i] = users[upline1].levels[i].add(1);
-					upline = users[upline1].referrer;
+					upline1 = users[upline1].referrer;
 				} else break;
 			}
 		}
 
 		if (user.referrer != address(0)) {
 			address upline = user.referrer;
-			for (uint256 j = 0; j < 5; i++) {
+			for (uint256 j = 0; j < 5; j++) {
 				if (upline != address(0)) {
 					uint256 amount = amounterc.mul(REFERRAL_PERCENTS[j]).div(PERCENTS_DIVIDER);
 					users[upline].bonus = users[upline].bonus.add(amount);
@@ -215,7 +216,7 @@ contract CAKEFarmer {
 	}
 
 	function getUserTotalReferrals(address userAddress) public view returns(uint256) {
-		return users[userAddress].levels[0]+users[userAddress].levels[1]+users[userAddress].levels[2]+users[userAddress].levels[3]+users[userAddress].levels[4];
+		return users[userAddress].levels[0];
 	}
 
 	function getUserReferralBonus(address userAddress) public view returns(uint256) {
